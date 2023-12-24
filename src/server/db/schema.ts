@@ -12,6 +12,7 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/mysql-core";
+import { z } from "zod";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -21,6 +22,14 @@ import {
  */
 export const mysqlTable = mysqlTableCreator((name) => `mood_${name}`);
 
+export const User = z.object({
+  id: z.string().uuid(),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable(),
+  clerkId: z.string(),
+  email: z.string().email(),
+});
+export type User = z.infer<typeof User>;
 export const users = mysqlTable("user", {
   id: varchar("id", { length: 36 })
     .primaryKey()
@@ -30,13 +39,21 @@ export const users = mysqlTable("user", {
     .notNull(),
   updatedAt: timestamp("updatedAt").onUpdateNow(),
 
-  clerkId: varchar("clerk_id", { length: 36 }).unique(),
-  email: varchar("email", { length: 256 }).unique(),
+  clerkId: varchar("clerk_id", { length: 36 }).notNull().unique(),
+  email: varchar("email", { length: 256 }).notNull().unique(),
 });
 export const usersRelations = relations(users, ({ many }) => ({
   journalEntries: many(journalEntries),
 }));
 
+export const JournalEntry = z.object({
+  id: z.string().uuid(),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable(),
+  content: z.string(),
+  userId: z.string().uuid(),
+});
+export type JournalEntry = z.infer<typeof JournalEntry>;
 export const journalEntries = mysqlTable(
   "journal_entry",
   {
@@ -48,8 +65,8 @@ export const journalEntries = mysqlTable(
       .notNull(),
     updatedAt: timestamp("updatedAt").onUpdateNow(),
 
-    content: text("content"),
-    userId: varchar("user_id", { length: 36 }),
+    content: text("content").notNull(),
+    userId: varchar("user_id", { length: 36 }).notNull(),
   },
   (table) => ({
     userId: index("user_id").on(table.userId),

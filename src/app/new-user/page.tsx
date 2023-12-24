@@ -16,7 +16,7 @@ const createNewUser = async () => {
 
   if (!match) {
     await db.insert(users).values({
-      email: user.emailAddresses[0]?.emailAddress ?? user.username,
+      email: user.emailAddresses[0]?.emailAddress ?? user.username ?? '',
       clerkId: user.id,
     });
   }
