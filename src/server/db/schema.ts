@@ -1,12 +1,15 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { sql } from "drizzle-orm";
+import { randomUUID } from "crypto";
+import { relations, sql } from "drizzle-orm";
 import {
-  bigint,
+  boolean,
   index,
   mysqlTableCreator,
+  text,
   timestamp,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/mysql-core";
 
@@ -18,17 +21,76 @@ import {
  */
 export const mysqlTable = mysqlTableCreator((name) => `mood_${name}`);
 
-export const posts = mysqlTable(
-  "post",
+export const users = mysqlTable("user", {
+  id: varchar("id", { length: 36 })
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  createdAt: timestamp("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updatedAt").onUpdateNow(),
+
+  clerkId: varchar("clerk_id", { length: 36 }).unique(),
+  email: varchar("email", { length: 256 }).unique(),
+});
+export const usersRelations = relations(users, ({ many }) => ({
+  journalEntries: many(journalEntries),
+}));
+
+export const journalEntries = mysqlTable(
+  "journal_entry",
   {
-    id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
-    name: varchar("name", { length: 256 }),
+    id: varchar("id", { length: 36 })
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
     createdAt: timestamp("created_at")
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     updatedAt: timestamp("updatedAt").onUpdateNow(),
+
+    content: text("content"),
+    userId: varchar("user_id", { length: 36 }),
   },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
-  })
+  (table) => ({
+    userId: index("user_id").on(table.userId),
+  }),
 );
+export const journalEntriesRelations = relations(journalEntries, ({ one }) => ({
+  user: one(users, {
+    fields: [journalEntries.userId],
+    references: [users.id],
+  }),
+  analysis: one(analyses, {
+    fields: [journalEntries.id],
+    references: [analyses.entryId],
+  }),
+}));
+
+export const analyses = mysqlTable(
+  "analysis",
+  {
+    id: varchar("id", { length: 36 })
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
+    createdAt: timestamp("created_at")
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updatedAt").onUpdateNow(),
+
+    entryId: varchar("entry_id", { length: 36 }).unique(),
+
+    mood: varchar("mood", { length: 256 }),
+    summary: text("summary"),
+    color: varchar("color", { length: 7 }),
+    negative: boolean("negative"),
+  },
+  (table) => ({
+    entryId: uniqueIndex("entry_id").on(table.entryId),
+  }),
+);
+export const analysesRelations = relations(analyses, ({ one }) => ({
+  entry: one(journalEntries, {
+    fields: [analyses.entryId],
+    references: [journalEntries.id],
+  }),
+}));
