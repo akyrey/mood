@@ -1,4 +1,5 @@
-import { JournalEntry } from "@prisma/client";
+import type { JournalEntry } from "@prisma/client";
+import Link from "next/link";
 import EntryCard from "~/app/_components/EntryCard";
 import NewEntryCard from "~/app/_components/NewEntryCard";
 import { api } from "~/trpc/server";
@@ -12,7 +13,9 @@ const JournalPage = async () => {
       <div className="grid grid-cols-3 gap-4">
         <NewEntryCard />
         {entries.map((entry: JournalEntry) => (
-          <EntryCard key={entry.id} entry={entry} />
+          <Link href={`/journal/${entry.id}`} key={entry.id}>
+            <EntryCard entry={entry} />
+          </Link>
         ))}
       </div>
     </div>
