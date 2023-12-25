@@ -6,8 +6,11 @@ import { api } from "~/trpc/react";
 
 const NewEntryCard = () => {
   const router = useRouter();
+  const utils = api.useUtils();
+
   const { mutate, isLoading } = api.journal.create.useMutation({
     onSuccess: (entry: JournalEntry) => {
+      void utils.journal.getAll.invalidate();
       router.push(`/journal/${entry.id}`);
     },
   });

@@ -20,4 +20,33 @@ export const journalRouter = createTRPCRouter({
       orderBy: [{ createdAt: "desc" }],
     });
   }),
+  getOne: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.journalEntry.findUniqueOrThrow({
+        where: {
+          // Using a unique compound index here
+          userId_id: {
+            id: input.id,
+            userId: ctx.user.id,
+          },
+        },
+      });
+    }),
+  update: protectedProcedure
+    .input(z.object({ id: z.string().uuid(), content: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.journalEntry.update({
+        where: {
+          // Using a unique compound index again
+          userId_id: {
+            id: input.id,
+            userId: ctx.user.id,
+          },
+        },
+        data: {
+          content: input.content,
+        },
+      });
+    }),
 });
