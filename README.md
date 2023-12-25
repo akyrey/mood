@@ -1,14 +1,13 @@
 # Mood - AI powered journal T3 app
 
-Following along [this](https://frontendmasters.com/courses/fullstack-app-next-v3/) course
+Following along [this](https://frontendmasters.com/courses/fullstack-app-next-v3/) course and adding info based on
+[this](https://www.youtube.com/watch?v=YkOSUVzOAA4) great video from Theo
 
 ## Instructions
 
 Managing authentication using [Clerk.dev](https://clerk.dev/)
 
-Switched Prisma for Drizzle and using trpc for the API
-
-Using PlanetScale for the DB
+Using Prisma, PlanetScale, trpc for the API
 
 ### PlanetScale commands
 

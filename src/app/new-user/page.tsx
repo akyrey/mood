@@ -1,8 +1,6 @@
 import { currentUser } from "@clerk/nextjs";
-import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { db } from "~/server/db";
-import { users } from "~/server/db/schema";
 
 const createNewUser = async () => {
   const user = await currentUser();
@@ -10,14 +8,18 @@ const createNewUser = async () => {
     return;
   }
 
-  const match = await db.query.users.findFirst({
-    where: eq(users.clerkId, user.id),
+  const match = await db.user.findUnique({
+    where: {
+      clerkId: user.id,
+    },
   });
 
   if (!match) {
-    await db.insert(users).values({
-      email: user.emailAddresses[0]?.emailAddress ?? user.username ?? '',
-      clerkId: user.id,
+    await db.user.create({
+      data: {
+        email: user.emailAddresses[0]?.emailAddress ?? user.username ?? "",
+        clerkId: user.id,
+      },
     });
   }
 
