@@ -16,7 +16,9 @@ const Editor = ({ entry }: EditorProps) => {
   useAutosave({
     data: value,
     onSave: (content: string) => {
-      mutate({ id: entry.id, content });
+      if (content !== entry.content) {
+        mutate({ id: entry.id, content });
+      }
     },
   });
 
