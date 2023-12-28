@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { analyze } from "~/utils/ai";
 
 export const journalRouter = createTRPCRouter({
   create: protectedProcedure
@@ -9,6 +10,9 @@ export const journalRouter = createTRPCRouter({
         data: {
           content: input.content,
           userId: ctx.user.id,
+          analysis: {
+            create: await analyze(input.content),
+          },
         },
       });
     }),
@@ -46,6 +50,9 @@ export const journalRouter = createTRPCRouter({
         },
         data: {
           content: input.content,
+          analysis: {
+            update: await analyze(input.content),
+          },
         },
       });
     }),
