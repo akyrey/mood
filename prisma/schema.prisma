@@ -28,7 +28,7 @@ model JournalEntry {
   updatedAt DateTime @updatedAt
 
   userId   String    @db.VarChar(36)
-  user     User      @relation(fields: [userId], references: [id])
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   analysis Analysis?
 
   content String @db.Text
@@ -42,7 +42,7 @@ model Analysis {
   updatedAt DateTime @updatedAt
 
   entryId String       @db.VarChar(36)
-  entry   JournalEntry @relation(fields: [entryId], references: [id])
+  entry   JournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
 
   mood     String  @db.VarChar(255)
   subject  String  @db.VarChar(255)

@@ -14,6 +14,9 @@ export const journalRouter = createTRPCRouter({
             create: await analyze(input.content),
           },
         },
+        include: {
+          analysis: true,
+        },
       });
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -35,6 +38,9 @@ export const journalRouter = createTRPCRouter({
             userId: ctx.user.id,
           },
         },
+        include: {
+          analysis: true,
+        },
       });
     }),
   update: protectedProcedure
@@ -53,6 +59,9 @@ export const journalRouter = createTRPCRouter({
           analysis: {
             update: await analyze(input.content),
           },
+        },
+        include: {
+          analysis: true,
         },
       });
     }),
