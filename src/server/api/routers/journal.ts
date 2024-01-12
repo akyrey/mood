@@ -24,6 +24,9 @@ export const journalRouter = createTRPCRouter({
       where: {
         userId: ctx.user.id,
       },
+      include: {
+        analysis: true,
+      },
       orderBy: [{ createdAt: "desc" }],
     });
   }),
