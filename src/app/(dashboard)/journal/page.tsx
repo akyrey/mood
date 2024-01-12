@@ -2,6 +2,7 @@ import type { JournalEntry } from "@prisma/client";
 import Link from "next/link";
 import EntryCard from "~/app/_components/EntryCard";
 import NewEntryCard from "~/app/_components/NewEntryCard";
+import Question from "~/app/_components/Question";
 import { api } from "~/trpc/server";
 
 const JournalPage = async () => {
@@ -10,6 +11,9 @@ const JournalPage = async () => {
   return (
     <div className="h-full bg-zinc-400/10 p-10">
       <h2 className="mb-8 text-3xl">Journal</h2>
+      <div className="my-8">
+        <Question />
+      </div>
       <div className="grid grid-cols-3 gap-4">
         <NewEntryCard />
         {entries.map((entry: JournalEntry) => (
